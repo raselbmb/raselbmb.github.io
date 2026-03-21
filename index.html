@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/x-icon" href="/images/monkey.ico">
     <title>raselbmb - Terminal</title>
     <style>
         body {
@@ -64,6 +63,13 @@
     </div>
 
     <script>
+        // Force reload if the page is loaded from the browser's back-forward cache
+        window.addEventListener('pageshow', function (event) {
+            if (event.persisted) {
+                window.location.reload();
+            }
+        });
+
         const cmdInput = document.getElementById('cmd');
         const outputDiv = document.getElementById('output');
         const inputLine = document.getElementById('input-line');
@@ -123,29 +129,4 @@
                     printLine(`[${timestamp}] ${step}`);
                     
                     // Once the last step completes, execute the redirect
-                    if (index === simulationSteps.length - 1) {
-                        setTimeout(() => {
-                            redirect(command);
-                        }, 800);
-                    }
-                }, delay);
-                
-                // Increase delay for the next line (between 400ms and 1000ms)
-                delay += 400 + Math.random() * 600; 
-            });
-        }
-
-        function redirect(command) {
-            if (command === 'cv') {
-                // Update this to the actual path of your CV page
-                window.location.href = '/cv.html'; 
-            } else if (command === 'github') {
-                window.location.href = 'https://github.com/raselbmb';
-            } else if (command === 'simulation') {
-                // Update this to the actual path of your simulation page
-                window.location.href = '/simulation.html'; 
-            }
-        }
-    </script>
-</body>
-</html>
+                    if (index === simulationSteps.length -
