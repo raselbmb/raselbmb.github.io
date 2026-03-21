@@ -3,89 +3,148 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rasel's Personal Space</title>
-    <link rel="icon" type="image/x-icon" href="/monkey.ico">
+    <title>raselbmb - Terminal</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
-            color: #ffffff;
-            height: 100vh;
+            background-color: #0c0c0c;
+            color: #00ff00;
+            font-family: 'Courier New', Courier, monospace;
+            padding: 20px;
+            margin: 0;
+            overflow-x: hidden;
+            font-size: 16px;
+        }
+        #terminal {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .line {
+            margin: 5px 0;
+            line-height: 1.4;
+        }
+        .prompt-line {
             display: flex;
             align-items: center;
-            justify-content: center;
-            overflow: hidden;
         }
-
-        .intro-container {
-            text-align: center;
-            padding: 3rem;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 15px;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-            border: 1px solid rgba(255, 255, 255, 0.18);
-            max-width: 600px;
-            width: 90%;
-            animation: fadeIn 1.5s ease-in-out;
+        .prompt {
+            color: #00ff00;
+            margin-right: 10px;
+            white-space: nowrap;
         }
-
-        h1 {
-            font-size: 3.5rem;
-            margin-bottom: 1rem;
-            letter-spacing: 2px;
-            background: -webkit-linear-gradient(45deg, #00d2ff, #3a7bd5);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+        .highlight {
+            color: #ffffff;
+            font-weight: bold;
         }
-
-        p {
-            font-size: 1.2rem;
-            line-height: 1.6;
-            margin-bottom: 2rem;
-            color: #e0e0e0;
-        }
-
-        .cta-button {
-            display: inline-block;
-            padding: 12px 30px;
-            font-size: 1.1rem;
-            color: #fff;
-            background: #3a7bd5;
-            text-decoration: none;
-            border-radius: 30px;
-            transition: background 0.3s ease, transform 0.2s ease;
-        }
-
-        .cta-button:hover {
-            background: #00d2ff;
-            transform: translateY(-3px);
-            box-shadow: 0 10px 20px rgba(0, 210, 255, 0.3);
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        input {
+            background: transparent;
+            border: none;
+            color: #00ff00;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 16px;
+            outline: none;
+            flex-grow: 1;
+            caret-color: #00ff00;
         }
     </style>
 </head>
 <body>
-    <div class="intro-container">
-        <h1>Hi, I'm Rasel</h1>
-        <p>Welcome to my personal space on the web. I'm building something amazing here. Stay tuned!</p>
-        <a href="https://github.com/raselbmb" class="cta-button">Visit My GitHub</a>
+    <div id="terminal">
+        <div class="line">raselbmbOS v1.0.0 (tty1)</div>
+        <div class="line">Welcome to my personal space.</div>
+        <div class="line"><br>Type <span class="highlight">CV</span>, <span class="highlight">Github</span>, or <span class="highlight">Simulation</span> to view.</div>
+        <div class="line"><br></div>
+        
+        <div id="output"></div>
+        
+        <div class="prompt-line" id="input-line">
+            <span class="prompt">guest@raselbmb:~$</span>
+            <input type="text" id="cmd" autocomplete="off" spellcheck="false" autofocus>
+        </div>
     </div>
+
+    <script>
+        const cmdInput = document.getElementById('cmd');
+        const outputDiv = document.getElementById('output');
+        const inputLine = document.getElementById('input-line');
+
+        // Keep focus on the input field whenever the user clicks anywhere on the page
+        document.addEventListener('click', () => {
+            if (inputLine.style.display !== 'none') {
+                cmdInput.focus();
+            }
+        });
+
+        cmdInput.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                const val = this.value.trim().toLowerCase();
+                this.value = '';
+                
+                // Echo the command back to the terminal
+                printLine(`guest@raselbmb:~$ ${val}`);
+
+                if (val === 'cv' || val === 'github' || val === 'simulation') {
+                    // Hide input to prevent further typing during simulation
+                    inputLine.style.display = 'none';
+                    simulateCodingAndRedirect(val);
+                } else if (val === '') {
+                    // Empty enter, do nothing
+                } else {
+                    printLine(`bash: ${val}: command not found. Available commands: CV, Github, Simulation`);
+                }
+            }
+        });
+
+        function printLine(text) {
+            const div = document.createElement('div');
+            div.className = 'line';
+            div.textContent = text;
+            outputDiv.appendChild(div);
+            window.scrollTo(0, document.body.scrollHeight);
+        }
+
+        function simulateCodingAndRedirect(command) {
+            // Fake compiling / hacking terminal lines
+            const simulationSteps = [
+                "> Initializing core modules...",
+                "> Extracting user payload...",
+                "> Compiling dependencies [||||||||||20%]...",
+                "> Compiling dependencies [||||||||||||||||||||||100%]...",
+                "> Resolving internal state parameters...",
+                "> Establishing secure routing protocol...",
+                "> Access granted. Redirecting..."
+            ];
+
+            let delay = 0;
+            simulationSteps.forEach((step, index) => {
+                setTimeout(() => {
+                    // Add timestamp to look like real logs
+                    const timestamp = new Date().toISOString().split('T')[1].slice(0, -1);
+                    printLine(`[${timestamp}] ${step}`);
+                    
+                    // Once the last step completes, execute the redirect
+                    if (index === simulationSteps.length - 1) {
+                        setTimeout(() => {
+                            redirect(command);
+                        }, 800);
+                    }
+                }, delay);
+                
+                // Increase delay for the next line (between 400ms and 1000ms)
+                delay += 400 + Math.random() * 600; 
+            });
+        }
+
+        function redirect(command) {
+            if (command === 'cv') {
+                // Update this to the actual path of your CV page
+                window.location.href = '/cv.html'; 
+            } else if (command === 'github') {
+                window.location.href = 'https://github.com/raselbmb';
+            } else if (command === 'simulation') {
+                // Update this to the actual path of your simulation page
+                window.location.href = '/simulation.html'; 
+            }
+        }
+    </script>
 </body>
 </html>
