@@ -13,104 +13,104 @@
             margin: 0;
             overflow-x: hidden;
             font-size: 16px;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            box-sizing: border-box;
         }
-        #terminal {
-            max-width: 800px;
-            margin: 0 auto;
+        #top-half {
+            margin-bottom: 20px;
+            border-bottom: 1px dashed #00ff00;
+            padding-bottom: 20px;
         }
         .line {
             margin: 5px 0;
             line-height: 1.4;
         }
-        .prompt-line {
+        .action-buttons {
             display: flex;
-            align-items: center;
+            gap: 15px;
+            margin-top: 15px;
+            flex-wrap: wrap;
         }
-        .prompt {
+        button {
+            background-color: transparent;
             color: #00ff00;
-            margin-right: 10px;
-            white-space: nowrap;
-        }
-        .highlight {
-            color: #ffffff;
-            font-weight: bold;
-        }
-        input {
-            background: transparent;
-            border: none;
-            color: #00ff00;
+            border: 1px solid #00ff00;
+            padding: 10px 15px;
             font-family: 'Courier New', Courier, monospace;
             font-size: 16px;
-            outline: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        button:hover:not(:disabled) {
+            background-color: #00ff00;
+            color: #0c0c0c;
+        }
+        button:disabled {
+            border-color: #005500;
+            color: #005500;
+            cursor: not-allowed;
+        }
+        #bottom-half {
             flex-grow: 1;
-            caret-color: #00ff00;
+            overflow-y: auto;
+            padding: 10px;
+            background-color: #050505;
+            border: 1px solid #003300;
+        }
+        .output-line {
+            margin: 4px 0;
         }
     </style>
 </head>
 <body>
-    <div id="terminal">
+    <div id="top-half">
         <div class="line">raselbmbOS v1.0.0 (tty1)</div>
         <div class="line">Welcome to my personal space.</div>
-        <div class="line"><br>Type <span class="highlight">CV</span>, <span class="highlight">Github</span>, or <span class="highlight">Simulation</span> to view.</div>
-        <div class="line"><br></div>
+        <div class="line">Select a command to execute:</div>
         
-        <div id="output"></div>
-        
-        <div class="prompt-line" id="input-line">
-            <span class="prompt">guest@raselbmb:~$</span>
-            <input type="text" id="cmd" autocomplete="off" spellcheck="false" autofocus>
+        <div class="action-buttons">
+            <button id="btn-cv" onclick="executeCommand('cv')">[ ./view_cv.sh ]</button>
+            <button id="btn-github" onclick="executeCommand('github')">[ ./open_github.sh ]</button>
+            <button id="btn-simulation" onclick="executeCommand('simulation')">[ ./run_simulation.sh ]</button>
         </div>
     </div>
 
+    <div id="bottom-half">
+        <div id="output"></div>
+    </div>
+
     <script>
-        // Force reload if the page is loaded from the browser's back-forward cache
-        window.addEventListener('pageshow', function (event) {
-            if (event.persisted) {
-                window.location.reload();
-            }
-        });
-
-        const cmdInput = document.getElementById('cmd');
         const outputDiv = document.getElementById('output');
-        const inputLine = document.getElementById('input-line');
+        const buttons = document.querySelectorAll('button');
 
-        // Keep focus on the input field whenever the user clicks anywhere on the page
-        document.addEventListener('click', () => {
-            if (inputLine.style.display !== 'none') {
-                cmdInput.focus();
-            }
-        });
-
-        cmdInput.addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') {
-                const val = this.value.trim().toLowerCase();
-                this.value = '';
-                
-                // Echo the command back to the terminal
-                printLine(`guest@raselbmb:~$ ${val}`);
-
-                if (val === 'cv' || val === 'github' || val === 'simulation') {
-                    // Hide input to prevent further typing during simulation
-                    inputLine.style.display = 'none';
-                    simulateCodingAndRedirect(val);
-                } else if (val === '') {
-                    // Empty enter, do nothing
-                } else {
-                    printLine(`bash: ${val}: command not found. Available commands: CV, Github, Simulation`);
-                }
-            }
+        // Reset the page state when navigating back via browser history
+        window.addEventListener('pageshow', function (event) {
+            buttons.forEach(btn => btn.disabled = false);
+            outputDiv.innerHTML = ''; // Clear terminal output
         });
 
         function printLine(text) {
             const div = document.createElement('div');
-            div.className = 'line';
+            div.className = 'output-line';
             div.textContent = text;
             outputDiv.appendChild(div);
-            window.scrollTo(0, document.body.scrollHeight);
+            
+            // Auto-scroll to bottom
+            const bottomHalf = document.getElementById('bottom-half');
+            bottomHalf.scrollTop = bottomHalf.scrollHeight;
         }
 
-        function simulateCodingAndRedirect(command) {
-            // Fake compiling / hacking terminal lines
+        function executeCommand(command) {
+            // Disable buttons to prevent multiple clicks
+            buttons.forEach(btn => btn.disabled = true);
+            
+            // Clear previous output
+            outputDiv.innerHTML = '';
+            
+            printLine(`guest@raselbmb:~$ executing ${command}...`);
+
             const simulationSteps = [
                 "> Initializing core modules...",
                 "> Extracting user payload...",
@@ -124,9 +124,29 @@
             let delay = 0;
             simulationSteps.forEach((step, index) => {
                 setTimeout(() => {
-                    // Add timestamp to look like real logs
                     const timestamp = new Date().toISOString().split('T')[1].slice(0, -1);
                     printLine(`[${timestamp}] ${step}`);
                     
-                    // Once the last step completes, execute the redirect
-                    if (index === simulationSteps.length -
+                    if (index === simulationSteps.length - 1) {
+                        setTimeout(() => {
+                            redirect(command);
+                        }, 800);
+                    }
+                }, delay);
+                
+                delay += 400 + Math.random() * 600; 
+            });
+        }
+
+        function redirect(command) {
+            if (command === 'cv') {
+                window.location.href = '/cv.html'; 
+            } else if (command === 'github') {
+                window.location.href = 'https://github.com/raselbmb';
+            } else if (command === 'simulation') {
+                window.location.href = '/simulation.html'; 
+            }
+        }
+    </script>
+</body>
+</html>
