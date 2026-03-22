@@ -73,6 +73,7 @@
         
         <div class="action-buttons">
             <button id="btn-cv" onclick="executeCommand('cv')">[ ./view_cv.sh ]</button>
+            <button id="btn-resume" onclick="executeCommand('resume')">[ ./view_resume.sh ]</button>
             <button id="btn-github" onclick="executeCommand('github')">[ ./open_github.sh ]</button>
             <button id="btn-simulation" onclick="executeCommand('simulation')">[ ./run_simulation.sh ]</button>
         </div>
@@ -142,6 +143,8 @@
         function redirect(command) {
             if (command === 'cv') {
                 window.location.href = '/cv.html'; 
+            } else if (command === 'resume') {
+                window.location.href = '/resume.html'; 
             } else if (command === 'github') {
                 window.location.href = 'https://github.com/raselbmb';
             } else if (command === 'simulation') {
